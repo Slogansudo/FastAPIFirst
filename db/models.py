@@ -13,7 +13,7 @@ class Users(Base):
     last_name = Column(String(30), nullable=True)
     username = Column(String(50), unique=True, nullable=False)
     email = Column(String(256), nullable=False)
-    password = Column(String(50), nullable=False)
+    password = Column(Text, nullable=False)
     is_staff = Column(Boolean, default=False)
     is_active = Column(Boolean, default=False)
     travel_category = relationship('TravelCategory', back_populates='author')
