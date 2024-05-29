@@ -1,6 +1,6 @@
 
 from fastapi import APIRouter
-from schemas import RegisterModel
+from schemas import RegisterModel, LoginModel
 from db.database import Session, ENGINE
 from fastapi import HTTPException, status
 from db.models import Users, Address, TravelCategory, Travels, Comments
@@ -19,6 +19,17 @@ async def auth():
 @auth_router.get("/login")
 async def login():
     return {"message": "THIS IS LOGIN PAGE"}
+
+
+@auth_router.post("/login")
+async def login(user: LoginModel):
+    username = session.query(Users).filter(Users.username == user.username).first()
+    user_check = session.query(Users).filter(Users.username == user.username).first()
+    if username:
+        if username and security.check_password_hash(user_check.password, user.password):
+            return HTTPException(status_code=status.HTTP_200_OK, detail="Login")
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="username yoki password xato")
+    return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="bunday foydalanuvchi topilmadi")
 
 
 @auth_router.get('/register')
