@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from schemas import RegisterModel, LoginModel
 from db.database import Session, ENGINE
 from fastapi import HTTPException, status
-from db.models import Users, Address, TravelCategory, Travels, Comments
+from db.models import Users
 from werkzeug import security
 
 
@@ -27,7 +27,7 @@ async def login(user: LoginModel):
     user_check = session.query(Users).filter(Users.username == user.username).first()
     if username:
         if username and security.check_password_hash(user_check.password, user.password):
-            return HTTPException(status_code=status.HTTP_200_OK, detail="Login")
+            return HTTPException(status_code=status.HTTP_200_OK, detail="Successful")
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="username yoki password xato")
     return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="bunday foydalanuvchi topilmadi")
 
@@ -48,14 +48,12 @@ async def register(user: RegisterModel):
         return HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Bunday bunday email allaqachon mavjud")
 
     new_user = Users(
-        id=user.id,
         username=user.username,
         email=user.email,
         password=security.generate_password_hash(user.password),
-        is_staff=user.is_staff,
-        is_active=user.is_active,
     )
     session.add(new_user)
     session.commit()
-    return HTTPException(status_code=status.HTTP_201_CREATED,)
+    data = {'username': new_user.username, 'email': new_user.email, "is_active": new_user.is_active}
+    return HTTPException(status_code=status.HTTP_201_CREATED, detail=data)
 

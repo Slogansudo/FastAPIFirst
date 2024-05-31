@@ -3,12 +3,9 @@ from typing import Optional
 
 
 class RegisterModel(BaseModel):
-    id: Optional[int]
     username: str
     email: str
     password: str
-    is_staff: Optional[bool]
-    is_active: Optional[bool]
 
     class Config:
         orm_mode = True,
@@ -27,3 +24,33 @@ class RegisterModel(BaseModel):
 class LoginModel(BaseModel):
     username: str
     password: str
+
+
+class AddressModel(BaseModel):
+    name: str
+
+
+class PlacesModel(BaseModel):
+    name: str
+    address: AddressModel
+
+
+class TravelCategoryModel(BaseModel):
+    author: str
+    name: str
+
+
+class CommentsModel(BaseModel):
+    user: str
+    text: str
+
+
+class TravelsModel(BaseModel):
+    name: str
+    price: Optional[float]
+    price_type: str
+    description: str
+    category: TravelCategoryModel
+    palaces: PlacesModel
+    comments: CommentsModel
+    discounts: Optional[float]

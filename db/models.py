@@ -1,8 +1,7 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, Float, DateTime
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Boolean, Float, DateTime, func
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils.types import ChoiceType
 from db.database import Base
-from datetime import datetime
 
 
 class Users(Base):
@@ -28,8 +27,8 @@ class Address(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    created_date = Column(DateTime, autoincrement=True)
-    updated_date = Column(DateTime, autoincrement=True)
+    created_date = Column(DateTime, default=func.now())
+    updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
 
     places = relationship('Places', back_populates='address')
 
@@ -43,8 +42,8 @@ class Places(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
     address_id = Column(Integer, ForeignKey('address.id'), nullable=False)
-    created_date = Column(DateTime, autoincrement=True)
-    updated_date = Column(DateTime, autoincrement=True)
+    created_date = Column(DateTime, default=func.now())
+    updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
 
     address = relationship('Address', back_populates='places')
     travels = relationship('Travels', back_populates='places')
@@ -59,8 +58,8 @@ class TravelCategory(Base):
     id = Column(Integer, primary_key=True)
     author_id = Column(Integer, ForeignKey('users.id'))
     name = Column(String(50), nullable=False)
-    created_date = Column(DateTime, autoincrement=True)
-    updated_date = Column(DateTime, autoincrement=True)
+    created_date = Column(DateTime, default=func.now())
+    updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
     author = relationship('Users', back_populates='travel_category')
     travels = relationship('Travels', back_populates='travel_category')
 
@@ -74,8 +73,8 @@ class Comments(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     text = Column(Text, nullable=False)
-    created_date = Column(DateTime, autoincrement=True)
-    updated_date = Column(DateTime, autoincrement=True)
+    created_date = Column(DateTime, default=func.now())
+    updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
     users = relationship('Users', back_populates='comments')
     travels = relationship('Travels', back_populates='comments')
 
@@ -95,8 +94,8 @@ class Travels(Base):
     palaces_id = Column(Integer, ForeignKey('places.id'))
     comment_id = Column(Integer, ForeignKey('comments.id'))
     discounts = Column(Float, default=0)
-    created_date = Column(DateTime, autoincrement=True)
-    updated_date = Column(DateTime, autoincrement=True)
+    created_date = Column(DateTime, default=func.now())
+    updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
 
     comments = relationship('Comments', back_populates='travels')
     places = relationship('Places', back_populates='travels')

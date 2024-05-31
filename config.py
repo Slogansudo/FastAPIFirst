@@ -1,9 +1,11 @@
 from fastapi import FastAPI
 from auth import auth_router
-#from db.models import model_router
+from api_views import api_router
 
 app = FastAPI()
 app.include_router(auth_router)
+app.include_router(api_router)
+
 
 @app.get("/")
 async def index():
@@ -18,6 +20,7 @@ async def indexing(id: int):
 @app.post("/product")
 async def post_product():
     return {"message": "This is POST page"}
+
 
 @app.post("/test")
 async def index2():
