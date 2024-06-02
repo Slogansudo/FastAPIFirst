@@ -1,10 +1,18 @@
 from fastapi import FastAPI
 from auth import auth_router
-from api_views import api_router
+from travels import travel_router
+from travel_category import travel_category_router
+from places import places_router
+from comments import comments_router
+from addresses import address_router
 
-app = FastAPI()
-app.include_router(auth_router)
-app.include_router(api_router)
+app = FastAPI(title="FastAPI v1")
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(travel_router, prefix="/api/v1")
+app.include_router(travel_category_router, prefix="/api/v1")
+app.include_router(places_router, prefix="/api/v1")
+app.include_router(comments_router, prefix="/api/v1")
+app.include_router(address_router, prefix="/api/v1")
 
 
 @app.get("/")
