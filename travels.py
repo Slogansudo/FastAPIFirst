@@ -86,3 +86,60 @@ def get_travel(id: int):
     if not travel:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return HTTPException(status_code=status.HTTP_200_OK, detail=travel)
+
+
+@travel_router.put("/{id}")
+def update_travel(id: int, travel: TravelsModel):
+    exist_travel = session.query(Travels).filter(Travels.id == id).first()
+    if not exist_travel:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    exist_category = session.query(TravelCategory).filter(TravelCategory.name == travel.category.name).first()
+    if not exist_category:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Category is not found")
+    exist_places = session.query(Places).filter(Places.name == travel.palaces.name).first()
+    if not exist_places:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Place is not found")
+    exist_user = session.query(Users).filter(Users.username == travel.comments.user).first()
+    if not exist_user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is not exist")
+    exist_comment = session.query(Comments).filter(Comments.user_id == exist_user.id).first()
+    if not exist_comment:
+        new_comment = Comments(
+            user_id=exist_user.id,
+            text=travel.comments.text
+        )
+        session.add(new_comment)
+        session.commit()
+        session.refresh(new_comment)
+        exist_travel.name = travel.name
+        exist_travel.price = travel.price
+        exist_travel.price_type = travel.price_type
+        exist_travel.description = travel.description
+        exist_travel.category_id = exist_category.id
+        exist_travel.palaces_id = exist_places.id
+        exist_travel.comments_id = new_comment.id
+        session.commit()
+        return HTTPException(status_code=status.HTTP_200_OK, detail="Travel successfully updated")
+
+    exist_comment.text = travel.comments.text
+    exist_comment.user_id = exist_user.id
+    session.commit()
+
+    exist_travel.name = travel.name
+    exist_travel.price = travel.price
+    exist_travel.price_type = travel.price_type
+    exist_travel.description = travel.description
+    exist_travel.category_id = exist_category.id
+    exist_travel.palaces_id = exist_places.id
+    exist_travel.comments_id = exist_comment.id
+    session.commit()
+    return HTTPException(status_code=status.HTTP_200_OK, detail="Travel successfully updated")
+
+
+@travel_router.delete("/{id}")
+async def delete_travel(id: int):
+    exist_travel = session.query(Travels).filter(Travels.id == id).first()
+    session.delete(exist_travel)
+    session.commit()
+    return HTTPException(status_code=status.HTTP_200_OK, detail="Travel successfully deleted")
+
