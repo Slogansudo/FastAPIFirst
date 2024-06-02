@@ -42,9 +42,16 @@ async def update_address(id: int, address: AddressModel):
     exist_address = session.query(Address).filter(Address.id == id).first()
     if exist_address is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    search = session.query(Address).filter(Address.name == address.name).first()
-    if search is None:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Address already exist exist")
     exist_address.name = address.name
     session.commit()
     return HTTPException(status_code=status.HTTP_200_OK, detail="address successfully updated")
+
+
+@address_router.delete("/{id}")
+async def delete_address(id: int):
+    exist_address = session.query(Address).filter(Address.id == id).first()
+    if exist_address is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    session.delete(exist_address)
+    session.commit()
+    return HTTPException(status_code=status.HTTP_200_OK, detail="successfully deleted")

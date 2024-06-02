@@ -34,3 +34,36 @@ async def create_travel_category(travel_category: TravelCategoryModel):
         session.commit()
         session.refresh(new_category)
         return {"message": "TravelCategory successful created", "travel_category": new_category}
+
+
+@travel_category_router.get("/{id}")
+def get_travel_category(id: int):
+    exist_travel_category = session.query(TravelCategory).filter(TravelCategory.id == id).first()
+    if not exist_travel_category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    return HTTPException(status_code=status.HTTP_200_OK, detail=exist_travel_category)
+
+
+@travel_category_router.put("/{id}")
+def update_travel_category(id: int, travel_category: TravelCategoryModel):
+    exist_travel_category = session.query(TravelCategory).filter(TravelCategory.id == id).first()
+    if not exist_travel_category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    author = session.query(Users).filter(Users.username == travel_category.author).first()
+    if author is None:
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+    exist_travel_category.author_id = author.id
+    exist_travel_category.name = travel_category.name
+    session.commit()
+    return HTTPException(status_code=status.HTTP_200_OK, detail="successfully updated")
+
+
+@travel_category_router.delete("/{id}")
+def delete_travel_category(id: int):
+    exist_travel_category = session.query(TravelCategory).filter(TravelCategory.id == id).first()
+    if not exist_travel_category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    session.delete(exist_travel_category)
+    session.commit()
+    return HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+

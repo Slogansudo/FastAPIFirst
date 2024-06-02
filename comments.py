@@ -52,3 +52,13 @@ async def update_comment(id: int, comment: CommentsModel):
     commentw.text = comment.text
     session.commit()
     return HTTPException(status_code=status.HTTP_200_OK, detail=comment)
+
+
+@comments_router.delete("/{id}")
+async def delete_comment(id: int):
+    comment = session.query(Comments).filter(Comments.id == id).first()
+    if not comment:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    session.delete(comment)
+    session.commit()
+    return HTTPException(status_code=status.HTTP_204_NO_CONTENT)
