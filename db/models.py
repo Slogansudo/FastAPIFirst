@@ -27,6 +27,7 @@ class Address(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
+    loking_count = Column(Integer, nullable=False, default=0)
     created_date = Column(DateTime, default=func.now())
     updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
 
@@ -41,6 +42,7 @@ class Places(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50))
+    rating = Column(Integer, nullable=False, default=0)
     address_id = Column(Integer, ForeignKey('address.id'), nullable=False)
     created_date = Column(DateTime, default=func.now())
     updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
@@ -73,6 +75,7 @@ class Comments(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     text = Column(Text, nullable=False)
+    reads_count = Column(Integer, nullable=False, default=0)
     created_date = Column(DateTime, default=func.now())
     updated_date = Column(DateTime, default=func.now(), onupdate=func.now())
     users = relationship('Users', back_populates='comments')

@@ -37,6 +37,10 @@ class PlacesModel(BaseModel):
     address: AddressModel
 
 
+class RatePlacesModel(BaseModel):
+    rate: int
+
+
 class TravelCategoryModel(BaseModel):
     author: str
     name: str
@@ -56,3 +60,11 @@ class TravelsModel(BaseModel):
     palaces: PlacesModel
     comments: CommentsModel
     discounts: Optional[float]
+
+
+class CheckUserModel(BaseModel):
+    username: str
+    password: str
+
+
+

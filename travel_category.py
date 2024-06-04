@@ -3,7 +3,7 @@ from schemas import AddressModel, PlacesModel, TravelCategoryModel, CommentsMode
 from db.database import Session, ENGINE
 from fastapi import HTTPException, status
 from db.models import Address, TravelCategory, Travels, Comments, Users, Places
-
+from fastapi.encoders import jsonable_encoder
 
 session = Session(bind=ENGINE)
 travel_category_router = APIRouter(prefix="/travelcategory")
@@ -67,3 +67,19 @@ def delete_travel_category(id: int):
     session.commit()
     return HTTPException(status_code=status.HTTP_204_NO_CONTENT)
 
+
+@travel_category_router.get("/{id}/author")
+async def get_travel_category_author(id: int):
+    exist_travel_category = session.query(TravelCategory).filter(TravelCategory.id == id).first()
+    if not exist_travel_category:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    data = {
+        "user_id": exist_travel_category.author_id,
+        "first_name": exist_travel_category.author.first_name,
+        "last_name": exist_travel_category.author.last_name,
+        "email": exist_travel_category.author.email,
+        "is_active": exist_travel_category.author.is_active,
+        "is_staff": exist_travel_category.author.is_staff
+    }
+    data = jsonable_encoder(data)
+    return data

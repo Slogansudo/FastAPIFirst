@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi.encoders import jsonable_encoder
 from schemas import AddressModel, PlacesModel, TravelCategoryModel, CommentsModel, TravelsModel
 from db.database import Session, ENGINE
 from fastapi import HTTPException, status
@@ -62,3 +63,26 @@ async def delete_comment(id: int):
     session.delete(comment)
     session.commit()
     return HTTPException(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@comments_router.get("/{id}/about_comment")
+async def active_users(id: int):
+    comments = session.query(Comments).filter(Comments.id == id).first()
+    if not comments:
+        return HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    comments.reads_count += 1
+    session.commit()
+    data = {
+        "text": comments.text,
+        "reads_count": comments.reads_count,
+        "user": {
+            comments.users.username,
+            comments.users.first_name,
+            comments.users.last_name,
+            comments.users.is_active
+        },
+        "create_date": comments.created_date,
+        "last_update": comments.updated_date,
+    }
+    return jsonable_encoder(data)
+
