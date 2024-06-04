@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from schemas import AddressModel, PlacesModel, TravelCategoryModel, CommentsModel, TravelsModel
+from schemas import AddressModel, PlacesModel, TravelCategoryModel, CommentsModel, TravelsModel, CheckUserModel
 from db.database import Session, ENGINE
 from fastapi import HTTPException, status
 from db.models import Address, TravelCategory, Travels, Comments, Users, Places
@@ -45,7 +45,12 @@ def get_travel_category(id: int):
 
 
 @travel_category_router.put("/{id}")
-def update_travel_category(id: int, travel_category: TravelCategoryModel):
+def update_travel_category(id: int, travel_category: TravelCategoryModel, user: CheckUserModel):
+    user = session.query(Users).filter(Users.id == id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User not found")
+    if user.is_staff is False:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="This user is not staff")
     exist_travel_category = session.query(TravelCategory).filter(TravelCategory.id == id).first()
     if not exist_travel_category:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)

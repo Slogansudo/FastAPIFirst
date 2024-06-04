@@ -3,7 +3,7 @@ from schemas import AddressModel, PlacesModel, TravelCategoryModel, CommentsMode
 from db.database import Session, ENGINE
 from fastapi import HTTPException, status
 from db.models import Address, TravelCategory, Travels, Comments, Users, Places
-
+from fastapi.encoders import jsonable_encoder
 
 session = Session(bind=ENGINE)
 travel_router = APIRouter(prefix='/travel')
@@ -142,4 +142,84 @@ async def delete_travel(id: int):
     session.delete(exist_travel)
     session.commit()
     return HTTPException(status_code=status.HTTP_200_OK, detail="Travel successfully deleted")
+
+
+@travel_router.get("/{id}/category")
+async def get_category(id: int):
+    travel = session.query(Travels).filter(Travels.id == id).first()
+    if travel is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="travel not found")
+    data = {
+        "category": {
+            "id": travel.category_id,
+            "name": travel.travel_category.name,
+            "author_id": travel.travel_category.author_id,
+            "created_date": travel.travel_category.created_date,
+            "updated_date": travel.travel_category.updated_date
+        }
+    }
+    data = jsonable_encoder(data)
+    raise HTTPException(status_code=status.HTTP_200_OK, detail=data)
+
+
+@travel_router.get("/{id}/category/author")
+async def get_place(id: int):
+    travel = session.query(Travels).filter(Travels.id == id).first()
+    if travel is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    data = {
+        "place": {
+            "id": travel.travel_category.author_id,
+            "username": travel.travel_category.author.username,
+            "email": travel.travel_category.author.email,
+            "is_active": travel.travel_category.author.is_active
+        }
+    }
+    data = jsonable_encoder(data)
+    raise HTTPException(status_code=status.HTTP_200_OK, detail=data)
+
+
+@travel_router.get("/{id}/place")
+async def get_places(id: int):
+    travel = session.query(Travels).filter(Travels.id == id).first()
+    if travel is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Travel not found")
+    data = {
+        "place": {
+            "id": travel.places.id,
+            "name": travel.places.name,
+            "rating": travel.places.rating,
+            "address": {
+                "id": travel.places.address.id,
+                "name": travel.places.address.name
+            },
+            "created_date": travel.places.created_date,
+            "updated_date": travel.places.updated_date
+
+        }
+    }
+    data = jsonable_encoder(data)
+    raise HTTPException(status_code=status.HTTP_200_OK, detail=data)
+
+
+@travel_router.get("/{id}/comments")
+async def get_place_comments(id: int):
+    travel = session.query(Travels).filter(Travels.id == id).first()
+    if travel is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Travel not found")
+    data = {
+        "comment": {
+            "id": travel.comments.id,
+            "text": travel.comments.text,
+            "user": {
+                "id": travel.comments.users.id,
+                "username": travel.comments.users.username,
+                "email": travel.comments.users.email
+            },
+            "created_date": travel.comments.created_date,
+            "updated_date": travel.comments.updated_date
+        }
+    }
+    data = jsonable_encoder(data)
+    raise HTTPException(status_code=status.HTTP_200_OK, detail=data)
 
