@@ -5,8 +5,17 @@ from travel_category import travel_category_router
 from places import places_router
 from comments import comments_router
 from addresses import address_router
+from fastapi_jwt_auth import AuthJWT
+from schemas import JwtModel
 
 app = FastAPI(title="FastAPI v1")
+
+
+@AuthJWT.load_config
+def get_config():
+    return JwtModel()
+
+
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(travel_router, prefix="/api/v1")
 app.include_router(travel_category_router, prefix="/api/v1")

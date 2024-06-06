@@ -67,4 +67,5 @@ class CheckUserModel(BaseModel):
     password: str
 
 
-
+class JwtModel(BaseModel):
+    authjwt_secret_key: str = '6379e4ca89e82bf7864bed67bb305144bd0ae55e4f78d48672a2b5b7dee82244'
